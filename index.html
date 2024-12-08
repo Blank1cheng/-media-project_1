@@ -3,55 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图片滚动展示</title>
+    <title>商青铜神树</title>
     <style>
-        .gallery-container {
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .image-container {
             width: 100%;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 20px 0;
-            /* 自定义滚动条样式 */
-            scrollbar-width: thin;
-            scrollbar-color: #888 #f1f1f1;
+            text-align: center;
+            margin-bottom: 20px;
+            /* 确保图片容器始终在顶层 */
+            position: relative;
+            z-index: 1;
         }
 
-        .gallery-container::-webkit-scrollbar {
-            height: 8px;
+        .zoomable-image {
+            max-width: 80%;
+            height: auto;
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
         }
 
-        .gallery-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .gallery-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        .gallery-container img {
-            width: 300px;  /* 设置统一的宽度 */
-            height: 200px; /* 设置统一的高度 */
-            object-fit: cover; /* 保持图片比例并填充指定区域 */
-            margin-right: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .zoomed {
+            transform: scale(1.5);
+            cursor: zoom-out;
         }
 
         .audio-section {
-            margin-top: 20px;
-            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+            /* 确保音频控件在图片下方且不被遮挡 */
+            position: relative;
+            z-index: 2;
+        }
+
+        .play-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .play-button:hover {
+            background-color: #45a049;
+        }
+
+        .play-button.playing {
+            background-color: #f44336;
+        }
+
+        .audio-player {
+            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="gallery-container">
-        <img src="./image.jpg" alt="图片1">
-        <img src="./image2.jpg" alt="图片2">
+    <div class="image-container">
+        <img src="1.png" alt="商青铜神树" class="zoomable-image" id="treeImage">
     </div>
 
     <div class="audio-section">
-        <h3>播放音频</h3>
-        <!-- 在这里添加音频播放器代码 -->
+        <button class="play-button" id="playButton">点击此处听讲解</button>
+        <audio id="audioPlayer" class="audio-player">
+            <source src="non_tree.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放。
+        </audio>
     </div>
+
+    <script>
+        // 获取DOM元素
+        const img = document.getElementById('treeImage');
+        const audio = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+        let isPlaying = false;
+
+        // 图片缩放功能 - 独立的事件处理
+        img.addEventListener('click', function(e) {
+            e.stopPropagation(); // 防止事件冒泡
+            this.classList.toggle('zoomed');
+        });
+
+        // 音频播放功能 - 独立的事件处理
+        playButton.addEventListener('click', function(e) {
+            e.stopPropagation(); // 防止事件冒泡
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                playButton.classList.remove('playing');
+                playButton.textContent = '点击此处听讲解';
+            } else {
+                audio.play();
+                isPlaying = true;
+                playButton.classList.add('playing');
+                playButton.textContent = '点击暂停讲解';
+            }
+        });
+
+        // 音频播放结束时重置状态
+        audio.addEventListener('ended', function() {
+            isPlaying = false;
+            playButton.classList.remove('playing');
+            playButton.textContent = '点击此处听讲解';
+        });
+
+        // 防止图片缩放影响音频控件
+        document.addEventListener('click', function(e) {
+            if (!img.contains(e.target) && !audio.contains(e.target)) {
+                // 点击其他区域不影响音频播放
+                e.stopPropagation();
+            }
+        });
+    </script>
 </body>
 </html>
